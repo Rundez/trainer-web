@@ -1,6 +1,5 @@
 import "@mantine/core/styles.css";
 import {
-  MantineProvider,
   AppShell,
   Burger,
   Group,
@@ -24,41 +23,25 @@ import {
   IconTarget,
   IconLogout,
 } from "@tabler/icons-react";
-import { theme } from "./theme";
-import { AuthProvider, useAuth } from "./contexts/AuthContext";
-import { LoginScreen } from "./components/Login";
-import { apiClient } from "./utils/BaseApiClient";
-
-// Mock components for now - we'll replace these with real components later
-const Dashboard = () => (
-  <div>Dashboard - Overview of workouts, progress, etc.</div>
-);
-const Workouts = () => <div>Workouts - View and manage workouts</div>;
-const Programs = () => (
-  <div>Training Programs - Structured workout programs</div>
-);
-const Progress = () => <div>Progress - Charts and analytics</div>;
-const Profile = () => <div>Profile - User settings and preferences</div>;
+import { useAuth } from "../contexts/AuthContext";
+import { apiClient } from "../utils/BaseApiClient";
+import { Outlet, useNavigate } from "react-router";
 
 // Navigation items
 const navigationItems = [
-  { label: "Dashboard", icon: IconHome, component: Dashboard },
-  { label: "Workouts", icon: IconBarbell, component: Workouts },
-  { label: "Programs", icon: IconTarget, component: Programs },
-  { label: "Progress", icon: IconChartBar, component: Progress },
-  { label: "Profile", icon: IconUser, component: Profile },
+  { label: "Dashboard", icon: IconHome },
+  { label: "Workouts", icon: IconBarbell },
+  { label: "Programs", icon: IconTarget },
+  { label: "Progress", icon: IconChartBar },
+  { label: "Profile", icon: IconUser },
 ];
 
-// Main authenticated app shell
-const AuthenticatedApp = () => {
+export const AppLayout = () => {
   const [opened, { toggle }] = useDisclosure();
   const [activeSection, setActiveSection] = useState("Dashboard");
   const { user, logout } = useAuth();
-
-  // Find the active component
-  const ActiveComponent =
-    navigationItems.find((item) => item.label === activeSection)?.component ||
-    Dashboard;
+  const { isAuthenticated, isLoading } = useAuth();
+  const navigate = useNavigate();
 
   const handleLogout = async () => {
     try {
@@ -76,6 +59,21 @@ const AuthenticatedApp = () => {
 
     fetching();
   }, []);
+
+  if (isLoading) {
+    return (
+      <Center style={{ height: "100vh" }}>
+        <Stack align="center" gap="md">
+          <Loader size="lg" />
+          <Text>Loading...</Text>
+        </Stack>
+      </Center>
+    );
+  }
+
+  if (!isAuthenticated) {
+    navigate("/login");
+  }
 
   return (
     <AppShell
@@ -157,31 +155,9 @@ const AuthenticatedApp = () => {
           <Title order={2} mb="lg">
             {activeSection}
           </Title>
-          <ActiveComponent />
+          <Outlet />
         </div>
       </AppShell.Main>
     </AppShell>
   );
-};
-
-export default function App() {
-  return <AppContent />;
-}
-
-// App content that depends on auth state
-const AppContent = () => {
-  const { isAuthenticated, isLoading } = useAuth();
-
-  if (isLoading) {
-    return (
-      <Center style={{ height: "100vh" }}>
-        <Stack align="center" gap="md">
-          <Loader size="lg" />
-          <Text>Loading...</Text>
-        </Stack>
-      </Center>
-    );
-  }
-
-  return isAuthenticated ? <AuthenticatedApp /> : <LoginScreen />;
 };
