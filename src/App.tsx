@@ -10,13 +10,11 @@ import {
   Stack,
   Badge,
   Button,
-  Container,
-  Paper,
   Center,
   Loader,
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   IconHome,
   IconBarbell,
@@ -28,13 +26,14 @@ import {
 } from "@tabler/icons-react";
 import { theme } from "./theme";
 import { AuthProvider, useAuth } from "./contexts/AuthContext";
+import { LoginScreen } from "./components/Login";
+import { apiClient } from "./utils/apiClient";
 
 // Mock components for now - we'll replace these with real components later
 const Dashboard = () => (
   <div>Dashboard - Overview of workouts, progress, etc.</div>
 );
 const Workouts = () => <div>Workouts - View and manage workouts</div>;
-// const Exercises = () => <div>Exercises - Exercise library and management</div>;
 const Programs = () => (
   <div>Training Programs - Structured workout programs</div>
 );
@@ -45,45 +44,10 @@ const Profile = () => <div>Profile - User settings and preferences</div>;
 const navigationItems = [
   { label: "Dashboard", icon: IconHome, component: Dashboard },
   { label: "Workouts", icon: IconBarbell, component: Workouts },
-  // { label: "Exercises", icon: IconMuscle, component: Exercises },
   { label: "Programs", icon: IconTarget, component: Programs },
   { label: "Progress", icon: IconChartBar, component: Progress },
   { label: "Profile", icon: IconUser, component: Profile },
 ];
-
-// Login component for when user is not authenticated
-const LoginScreen = () => {
-  const { login, isLoading } = useAuth();
-
-  return (
-    <Container
-      size="sm"
-      style={{ height: "100vh", display: "flex", alignItems: "center" }}
-    >
-      <Paper p="xl" shadow="md" style={{ width: "100%" }}>
-        <Center mb="xl">
-          <Group gap="xs">
-            <IconBarbell size={40} color="var(--mantine-color-blue-6)" />
-            <Title order={1}>TrainerApp</Title>
-          </Group>
-        </Center>
-
-        <Text ta="center" c="dimmed" mb="xl">
-          Your personal fitness companion for tracking workouts, exercises, and
-          progress.
-        </Text>
-
-        <Button fullWidth size="lg" onClick={login} loading={isLoading}>
-          Sign In
-        </Button>
-
-        <Text ta="center" size="xs" c="dimmed" mt="md">
-          Development mode - click to continue
-        </Text>
-      </Paper>
-    </Container>
-  );
-};
 
 // Main authenticated app shell
 const AuthenticatedApp = () => {
@@ -95,6 +59,23 @@ const AuthenticatedApp = () => {
   const ActiveComponent =
     navigationItems.find((item) => item.label === activeSection)?.component ||
     Dashboard;
+
+  const handleLogout = async () => {
+    try {
+      await logout();
+    } catch (error) {
+      console.error("Logout failed:", error);
+    }
+  };
+
+  useEffect(() => {
+    const fetching = async () => {
+      const data = await apiClient.get("/exercise");
+      console.log(data);
+    };
+
+    fetching();
+  }, []);
 
   return (
     <AppShell
@@ -122,17 +103,19 @@ const AuthenticatedApp = () => {
           </Group>
 
           <Group>
-            <Badge variant="light" color="green">
-              Development
-            </Badge>
+            {import.meta.env.DEV && (
+              <Badge variant="light" color="green">
+                Development
+              </Badge>
+            )}
             <Text size="sm" c="dimmed">
-              Welcome, {user?.name || "Developer"}
+              Welcome, {user?.name || user?.email || "User"}
             </Text>
             <Button
               variant="subtle"
               size="sm"
               leftSection={<IconLogout size="1rem" />}
-              onClick={logout}
+              onClick={handleLogout}
             >
               Logout
             </Button>

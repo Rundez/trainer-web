@@ -6,19 +6,22 @@ import React, {
   useEffect,
   ReactNode,
 } from "react";
+import { Session } from "@supabase/supabase-js";
+import { supabase } from "../lib/supabase";
 
-interface User {
+interface AuthUser {
   id: string;
   email?: string;
   name?: string;
 }
 
 interface AuthContextType {
-  user: User | null;
+  user: AuthUser | null;
+  session: Session | null;
   isLoading: boolean;
   isAuthenticated: boolean;
   login: () => Promise<void>;
-  logout: () => void;
+  logout: () => Promise<void>;
   getAuthToken: () => string | null;
 }
 
@@ -29,27 +32,77 @@ interface AuthProviderProps {
 }
 
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<AuthUser | null>(null);
+  const [session, setSession] = useState<Session | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  // In development, we'll simulate authentication
-  // In production, this would integrate with Auth0
   const isDevelopment = import.meta.env.DEV;
 
   useEffect(() => {
-    if (isDevelopment) {
-      // Simulate dev authentication - matches your DevAuthHandler
-      setUser({
-        id: "test-user-123",
-        email: "dev@example.com",
-        name: "Test Developer",
-      });
+    // Get initial session
+    const getInitialSession = async () => {
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+
+      if (session) {
+        setSession(session);
+        setUser({
+          id: session.user.id,
+          email: session.user.email,
+          name:
+            session.user.user_metadata?.name ||
+            session.user.email?.split("@")[0],
+        });
+      } else if (isDevelopment) {
+        // Fall back to dev mode
+        setUser({
+          id: "test-user-123",
+          email: "dev@example.com",
+          name: "Test Developer",
+        });
+      }
+
       setIsLoading(false);
-    } else {
-      // In production, you'd check for Auth0 tokens here
-      // For now, just set loading to false
+    };
+
+    getInitialSession();
+
+    // Listen for auth changes
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange(async (event, session) => {
+      console.log("Auth state changed:", event, session);
+
+      if (session) {
+        setSession(session);
+        setUser({
+          id: session.user.id,
+          email: session.user.email,
+          name:
+            session.user.user_metadata?.name ||
+            session.user.email?.split("@")[0],
+        });
+      } else {
+        setSession(null);
+        if (isDevelopment) {
+          // Keep dev user in development
+          setUser({
+            id: "test-user-123",
+            email: "dev@example.com",
+            name: "Test Developer",
+          });
+        } else {
+          setUser(null);
+        }
+      }
+
       setIsLoading(false);
-    }
+    });
+
+    return () => {
+      subscription.unsubscribe();
+    };
   }, [isDevelopment]);
 
   const login = async () => {
@@ -60,33 +113,60 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         email: "dev@example.com",
         name: "Test Developer",
       });
-    } else {
-      // In production, redirect to Auth0
-      // window.location.href = '/auth/login';
-      console.log("Production Auth0 login would happen here");
+      return;
+    }
+
+    try {
+      // Redirect to Supabase Auth UI or use signInWithPassword
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: "google", // You can change this to your preferred provider
+        options: {
+          redirectTo: window.location.origin,
+        },
+      });
+
+      if (error) {
+        console.error("Login error:", error);
+        throw error;
+      }
+    } catch (error) {
+      console.error("Login failed:", error);
+      throw error;
     }
   };
 
-  const logout = () => {
-    setUser(null);
-    if (!isDevelopment) {
-      // In production, clear Auth0 session
-      // window.location.href = '/auth/logout';
-      console.log("Production Auth0 logout would happen here");
+  const logout = async () => {
+    if (isDevelopment) {
+      setUser(null);
+      return;
+    }
+
+    try {
+      const { error } = await supabase.auth.signOut();
+      if (error) {
+        console.error("Logout error:", error);
+        throw error;
+      }
+
+      setUser(null);
+      setSession(null);
+    } catch (error) {
+      console.error("Logout failed:", error);
+      throw error;
     }
   };
 
   const getAuthToken = () => {
     if (isDevelopment) {
-      // In dev mode, no token needed since backend uses DevAuthHandler
       return "dev-token";
     }
-    // In production, get the Auth0 JWT token from localStorage or wherever it's stored
-    return localStorage.getItem("auth_token");
+
+    return session?.access_token || null;
   };
 
   const value: AuthContextType = {
     user,
+    session,
     isLoading,
     isAuthenticated: !!user,
     login,

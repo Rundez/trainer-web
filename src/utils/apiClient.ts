@@ -1,4 +1,5 @@
 // src/utils/apiClient.ts
+import { supabase } from "../lib/supabase";
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:5226";
 const isDevelopment = import.meta.env.DEV;
@@ -15,22 +16,26 @@ export class ApiClient {
       "Content-Type": "application/json",
     };
 
-    // In development, no auth header needed due to DevAuthHandler
-    if (!isDevelopment) {
-      const token = this.getAuthToken();
-      if (token) {
-        headers["Authorization"] = `Bearer ${token}`;
-      }
+    // Get token based on environment
+    const token = await this.getAuthToken();
+    if (token) {
+      headers["Authorization"] = `Bearer ${token}`;
     }
 
     return headers;
   }
 
-  private getAuthToken(): string | null {
+  private async getAuthToken(): Promise<string | null> {
     if (isDevelopment) {
-      return "dev-token";
+      // In development, backend uses DevAuthHandler, so no token needed
+      return null;
     }
-    return localStorage.getItem("auth_token");
+
+    // Get current session from Supabase
+    const {
+      data: { session },
+    } = await supabase.auth.getSession();
+    return session?.access_token || null;
   }
 
   async get<T>(endpoint: string): Promise<T> {
