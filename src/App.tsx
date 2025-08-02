@@ -27,7 +27,7 @@ import {
 import { theme } from "./theme";
 import { AuthProvider, useAuth } from "./contexts/AuthContext";
 import { LoginScreen } from "./components/Login";
-import { apiClient } from "./utils/apiClient";
+import { apiClient } from "./utils/BaseApiClient";
 
 // Mock components for now - we'll replace these with real components later
 const Dashboard = () => (
@@ -70,7 +70,7 @@ const AuthenticatedApp = () => {
 
   useEffect(() => {
     const fetching = async () => {
-      const data = await apiClient.get("/exercise");
+      const data = await apiClient.exerciseAll();
       console.log(data);
     };
 
