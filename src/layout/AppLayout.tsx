@@ -26,6 +26,7 @@ import {
 import { useAuth } from "../contexts/AuthContext";
 import { apiClient } from "../utils/BaseApiClient";
 import { Outlet, useNavigate } from "react-router";
+import { useIsMobile } from "../hooks/useIsMobile";
 
 // Navigation items
 const navigationItems = [
@@ -42,6 +43,7 @@ export const AppLayout = () => {
   const { user, logout } = useAuth();
   const { isAuthenticated, isLoading } = useAuth();
   const navigate = useNavigate();
+  const isMobile = useIsMobile();
 
   const handleLogout = async () => {
     try {
@@ -101,14 +103,16 @@ export const AppLayout = () => {
           </Group>
 
           <Group>
-            {import.meta.env.DEV && (
-              <Badge variant="light" color="green">
-                Development
-              </Badge>
+            {import.meta.env.DEV && !isMobile && (
+              <>
+                <Badge variant="light" color="green">
+                  Development
+                </Badge>
+                <Text size="sm" c="dimmed">
+                  Welcome, {user?.name || user?.email || "User"}
+                </Text>
+              </>
             )}
-            <Text size="sm" c="dimmed">
-              Welcome, {user?.name || user?.email || "User"}
-            </Text>
             <Button
               variant="subtle"
               size="sm"
