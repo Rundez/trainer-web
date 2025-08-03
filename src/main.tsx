@@ -8,6 +8,7 @@ import { AuthProvider } from "./contexts/AuthContext.tsx";
 import { theme } from "./theme";
 import { LoginScreen } from "./components/Login.tsx";
 import { Dashboard } from "./pages/Dashboard.tsx";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 const router = createBrowserRouter([
   {
@@ -21,12 +22,16 @@ const router = createBrowserRouter([
   { path: "/login", element: <LoginScreen /> }, // No layout
 ]);
 
+const queryClient = new QueryClient();
+
 ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
   <React.StrictMode>
-    <MantineProvider theme={theme}>
-      <AuthProvider>
-        <RouterProvider router={router} />
-      </AuthProvider>
-    </MantineProvider>
+    <QueryClientProvider client={queryClient}>
+      <MantineProvider theme={theme}>
+        <AuthProvider>
+          <RouterProvider router={router} />
+        </AuthProvider>
+      </MantineProvider>
+    </QueryClientProvider>
   </React.StrictMode>
 );
