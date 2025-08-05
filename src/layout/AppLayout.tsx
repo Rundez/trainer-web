@@ -30,11 +30,11 @@ import { useIsMobile } from "../hooks/useIsMobile";
 
 // Navigation items
 const navigationItems = [
-  { label: "Dashboard", icon: IconHome },
-  { label: "Workouts", icon: IconBarbell },
-  { label: "Programs", icon: IconTarget },
-  { label: "Progress", icon: IconChartBar },
-  { label: "Profile", icon: IconUser },
+  { label: "Dashboard", icon: IconHome, url: "/" },
+  { label: "Workouts", icon: IconBarbell, url: "/workouts" },
+  { label: "Programs", icon: IconTarget, url: "/programs" },
+  { label: "Progress", icon: IconChartBar, url: "/progress" },
+  { label: "Profile", icon: IconUser, url: "/profile" },
 ];
 
 export const AppLayout = () => {
@@ -137,7 +137,10 @@ export const AppLayout = () => {
               active={activeSection === item.label}
               label={item.label}
               leftSection={<item.icon size="1rem" />}
-              onClick={() => setActiveSection(item.label)}
+              onClick={() => {
+                setActiveSection(item.label);
+                navigate(item.url);
+              }}
               style={{ borderRadius: "var(--mantine-radius-md)" }}
             />
           ))}
