@@ -15,7 +15,6 @@ import {
   IconTarget,
   IconClock,
 } from "@tabler/icons-react";
-import { QuickWorkoutFab } from "../components/QuickWorkoutFab";
 import { useGetAllPrograms } from "../queries/trainingProgramQueries";
 import { useGetAllWorkouts } from "../queries/workoutQueries";
 
@@ -25,11 +24,6 @@ export const Dashboard = () => {
 
   const recentWorkouts = workouts?.slice(0, 3) || [];
   const activePrograms = programs?.filter((p) => !p.isTemplate) || [];
-
-  const handleWorkoutCreated = (workoutId: number) => {
-    console.log("New workout created:", workoutId);
-    // You can add navigation or notification here
-  };
 
   return (
     <>
@@ -269,9 +263,6 @@ export const Dashboard = () => {
           </Group>
         </Card>
       </Stack>
-
-      {/* Floating Action Button for Quick Workout */}
-      <QuickWorkoutFab onWorkoutCreated={handleWorkoutCreated} />
     </>
   );
 };

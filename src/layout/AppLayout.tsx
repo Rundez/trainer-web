@@ -32,6 +32,7 @@ import { useIsMobile } from "../hooks/useIsMobile";
 const navigationItems = [
   { label: "Dashboard", icon: IconHome, url: "/" },
   { label: "Workouts", icon: IconBarbell, url: "/workouts" },
+  { label: "Quick Workout", icon: IconBarbell, url: "/workout" },
   { label: "Programs", icon: IconTarget, url: "/programs" },
   { label: "Progress", icon: IconChartBar, url: "/progress" },
   { label: "Profile", icon: IconUser, url: "/profile" },

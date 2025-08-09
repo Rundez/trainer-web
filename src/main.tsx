@@ -13,6 +13,7 @@ import { Workouts } from "./pages/Workouts.tsx";
 import { Programs } from "./pages/Programs.tsx";
 import { Progress } from "./pages/Progress.tsx";
 import { Profile } from "./pages/Profile.tsx";
+import { Workout } from "./pages/Workout.tsx";
 
 const router = createBrowserRouter([
   {
@@ -20,6 +21,7 @@ const router = createBrowserRouter([
     children: [
       { path: "/", element: <Dashboard /> },
       { path: "/workouts", element: <Workouts /> },
+      { path: "/workout", element: <Workout /> },
       { path: "/programs", element: <Programs /> },
       { path: "/progress", element: <Progress /> },
       { path: "/profile", element: <Profile /> },
