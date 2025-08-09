@@ -12,6 +12,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Workouts } from "./pages/Workouts.tsx";
 import { Programs } from "./pages/Programs.tsx";
 import { Progress } from "./pages/Progress.tsx";
+import { Profile } from "./pages/Profile.tsx";
 
 const router = createBrowserRouter([
   {
@@ -21,7 +22,7 @@ const router = createBrowserRouter([
       { path: "/workouts", element: <Workouts /> },
       { path: "/programs", element: <Programs /> },
       { path: "/progress", element: <Progress /> },
-      { path: "/profile", element: <Progress /> },
+      { path: "/profile", element: <Profile /> },
 
       // Add more protected routes here
     ],
