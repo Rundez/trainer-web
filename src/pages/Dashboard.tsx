@@ -215,11 +215,14 @@ export const Dashboard = () => {
                             Active
                           </Badge>
                           <Text size="xs" c="dimmed">
-                            {Math.round(
-                              (program.completedWorkoutCount /
-                                (program.weekCount * 3)) *
-                                100
-                            )}
+                            {(program?.completedWorkoutCount ?? 0) > 0 &&
+                            (program?.weekCount ?? 0) > 0
+                              ? Math.round(
+                                  ((program.completedWorkoutCount ?? 0) /
+                                    ((program.weekCount ?? 0) * 3)) *
+                                    100
+                                )
+                              : null}
                             % done
                           </Text>
                         </Stack>
