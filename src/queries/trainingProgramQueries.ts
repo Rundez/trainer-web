@@ -49,14 +49,13 @@ export const useCreateProgram = () => {
   return { mutate, error, isPending };
 };
 
-export const useUpdateProgram = (programId: number) => {
+// Dynamic variant for updating program
+export const useUpdateProgram = () => {
   const { mutate, error, isPending } = useMutation({
-    mutationKey: ["updateProgram", programId],
-    mutationFn: async (programData: TrainingProgramUpdateDto) => {
-      const response = await apiClient.trainingProgramPUT(
-        programId,
-        programData
-      );
+    mutationKey: ["updateProgramDynamic"],
+    mutationFn: async (params: { id: number; data: TrainingProgramUpdateDto }) => {
+      const { id, data } = params;
+      const response = await apiClient.trainingProgramPUT(id, data);
       return response;
     },
   });
@@ -89,15 +88,15 @@ export const useAddWeekToProgram = (programId: number) => {
   return { mutate, error, isPending };
 };
 
-export const useUpdateWeek = (programId: number, weekId: number) => {
+export const useUpdateWeek = () => {
   const { mutate, error, isPending } = useMutation({
-    mutationKey: ["updateWeek", programId, weekId],
-    mutationFn: async (weekData: TrainingProgramWeekUpdateDto) => {
-      const response = await apiClient.weeksPUT(programId, weekId, weekData);
+    mutationKey: ["updateWeekDynamic"],
+    mutationFn: async (params: { programId: number; weekId: number; data: TrainingProgramWeekUpdateDto }) => {
+      const { programId, weekId, data } = params;
+      const response = await apiClient.weeksPUT(programId, weekId, data);
       return response;
     },
   });
-
   return { mutate, error, isPending };
 };
 
@@ -130,24 +129,15 @@ export const useAddWorkoutToWeek = (programId: number, weekId: number) => {
   return { mutate, error, isPending };
 };
 
-export const useUpdateProgramWorkout = (
-  programId: number,
-  weekId: number,
-  workoutId: number
-) => {
+export const useUpdateProgramWorkout = () => {
   const { mutate, error, isPending } = useMutation({
-    mutationKey: ["updateProgramWorkout", programId, weekId, workoutId],
-    mutationFn: async (workoutData: TrainingProgramWorkoutUpdateDto) => {
-      const response = await apiClient.workoutsPUT(
-        programId,
-        weekId,
-        workoutId,
-        workoutData
-      );
+    mutationKey: ["updateProgramWorkoutDynamic"],
+    mutationFn: async (params: { programId: number; weekId: number; workoutId: number; data: TrainingProgramWorkoutUpdateDto }) => {
+      const { programId, weekId, workoutId, data } = params;
+      const response = await apiClient.workoutsPUT(programId, weekId, workoutId, data);
       return response;
     },
   });
-
   return { mutate, error, isPending };
 };
 
@@ -193,32 +183,15 @@ export const useAddExerciseToWorkout = (
   return { mutate, error, isPending };
 };
 
-export const useUpdateProgramExercise = (
-  programId: number,
-  weekId: number,
-  workoutId: number,
-  exerciseId: number
-) => {
+export const useUpdateProgramExercise = () => {
   const { mutate, error, isPending } = useMutation({
-    mutationKey: [
-      "updateProgramExercise",
-      programId,
-      weekId,
-      workoutId,
-      exerciseId,
-    ],
-    mutationFn: async (exerciseData: TrainingProgramExerciseUpdateDto) => {
-      const response = await apiClient.exercisesPUT(
-        programId,
-        weekId,
-        workoutId,
-        exerciseId,
-        exerciseData
-      );
+    mutationKey: ["updateProgramExerciseDynamic"],
+    mutationFn: async (params: { programId: number; weekId: number; workoutId: number; exerciseId: number; data: TrainingProgramExerciseUpdateDto }) => {
+      const { programId, weekId, workoutId, exerciseId, data } = params;
+      const response = await apiClient.exercisesPUT(programId, weekId, workoutId, exerciseId, data);
       return response;
     },
   });
-
   return { mutate, error, isPending };
 };
 

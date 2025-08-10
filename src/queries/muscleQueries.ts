@@ -26,18 +26,15 @@ export const useGetMuscleById = (muscleId: number) => {
   return { data, error, isLoading };
 };
 
-export const useUpdateMuscle = (
-  muscleId: number,
-  muscleData: MuscleCreateDto
-) => {
+export const useUpdateMuscle = () => {
   const { mutate, error, isPending } = useMutation({
-    mutationKey: ["updateMuscle", muscleId],
-    mutationFn: async () => {
-      const response = await apiClient.musclePUT(muscleId, muscleData);
+    mutationKey: ["updateMuscleDynamic"],
+    mutationFn: async (params: { id: number; data: MuscleCreateDto }) => {
+      const { id, data } = params;
+      const response = await apiClient.musclePUT(id, data);
       return response;
     },
   });
-
   return { mutate, error, isPending };
 };
 

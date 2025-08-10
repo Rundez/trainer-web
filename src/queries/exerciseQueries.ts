@@ -26,18 +26,15 @@ export const useGetExerciseById = (exerciseId: number) => {
   return { data, error, isLoading };
 };
 
-export const useUpdateExercise = (
-  exerciseId: number,
-  exerciseData: ExerciseCreateDto
-) => {
+export const useUpdateExercise = () => {
   const { mutate, error, isPending } = useMutation({
-    mutationKey: ["updateExercise", exerciseId],
-    mutationFn: async () => {
-      const response = await apiClient.exercisePUT(exerciseId, exerciseData);
+    mutationKey: ["updateExerciseDynamic"],
+    mutationFn: async (params: { id: number; data: ExerciseCreateDto }) => {
+      const { id, data } = params;
+      const response = await apiClient.exercisePUT(id, data);
       return response;
     },
   });
-
   return { mutate, error, isPending };
 };
 

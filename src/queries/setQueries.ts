@@ -51,20 +51,20 @@ export const useCreateSet = () => {
   return { mutate, error, isPending };
 };
 
-export const useUpdateSet = (setId: number) => {
-  const { mutate, error, isPending } = useMutation({
-    mutationKey: ["updateSet", setId],
-    mutationFn: async (setData: SetCreateDto) => {
-      const response = await apiClient.setPUT(setId, setData);
-      return response;
-    },
-  });
+// export const useUpdateSet = (setId: number) => {
+//   const { mutate, error, isPending } = useMutation({
+//     mutationKey: ["updateSet", setId],
+//     mutationFn: async (setData: SetCreateDto) => {
+//       const response = await apiClient.setPUT(setId, setData);
+//       return response;
+//     },
+//   });
 
-  return { mutate, error, isPending };
-};
+//   return { mutate, error, isPending };
+// };
 
 // Dynamic variant allowing passing the id at mutate time (useful for inline editing lists)
-export const useUpdateSetDynamic = () => {
+export const useUpdateSet = () => {
   const { mutate, error, isPending } = useMutation({
     mutationKey: ["updateSetDynamic"],
     mutationFn: async (params: { id: number; data: SetCreateDto }) => {

@@ -52,11 +52,25 @@ export const useCreateWorkout = () => {
   return { mutate, error, isPending };
 };
 
-export const useUpdateWorkout = (workoutId: number) => {
+// Legacy (id-in-hook) version kept for reference:
+// export const useUpdateWorkout = (workoutId: number) => {
+//   const { mutate, error, isPending } = useMutation({
+//     mutationKey: ["updateWorkout", workoutId],
+//     mutationFn: async (workoutData: WorkoutCreateDto) => {
+//       const response = await apiClient.workoutPUT(workoutId, workoutData);
+//       return response;
+//     },
+//   });
+//   return { mutate, error, isPending };
+// };
+
+// Dynamic variant: pass id together with data at mutate time
+export const useUpdateWorkout = () => {
   const { mutate, error, isPending } = useMutation({
-    mutationKey: ["updateWorkout", workoutId],
-    mutationFn: async (workoutData: WorkoutCreateDto) => {
-      const response = await apiClient.workoutPUT(workoutId, workoutData);
+    mutationKey: ["updateWorkoutDynamic"],
+    mutationFn: async (params: { id: number; data: WorkoutCreateDto }) => {
+      const { id, data } = params;
+      const response = await apiClient.workoutPUT(id, data);
       return response;
     },
   });

@@ -19,7 +19,7 @@ import {
 import { IconPlus, IconTrash, IconCircleCheck } from "@tabler/icons-react";
 import { useCreateWorkout, useUpdateWorkout } from "../queries/workoutQueries";
 import { useGetAllExercises } from "../queries/exerciseQueries";
-import { useCreateSet, useUpdateSetDynamic } from "../queries/setQueries";
+import { useCreateSet, useUpdateSet } from "../queries/setQueries";
 import { SetCreateDto, WorkoutCreateDto } from "../api-client";
 import { useQueryClient } from "@tanstack/react-query";
 // Simple local id generator (avoid extra dependency for now)
@@ -72,8 +72,8 @@ export const Workout = () => {
   const { mutate: createWorkout, isPending: isCreatingWorkout } =
     useCreateWorkout();
   const { mutate: createSet, isPending: isCreatingSet } = useCreateSet();
-  const { mutate: updateSet, isPending: isUpdatingSet } = useUpdateSetDynamic();
-  const { mutate: updateWorkout, isPending: isUpdatingWorkout } = useUpdateWorkout(workoutId || 0);
+  const { mutate: updateSet, isPending: isUpdatingSet } = useUpdateSet();
+  const { mutate: updateWorkout, isPending: isUpdatingWorkout } = useUpdateWorkout();
 
   // Local storage persistence for "current" workout draft
   const STORAGE_KEY = "currentWorkoutDraft";
@@ -226,7 +226,7 @@ export const Workout = () => {
                 notes: notes || undefined,
                 setIds: [],
               });
-              updateWorkout(dto, { onSuccess: () => queryClient.invalidateQueries({ queryKey: ["workout", workoutId] }) });
+              updateWorkout( {data: dto, id: workoutId}, { onSuccess: () => queryClient.invalidateQueries({ queryKey: ["workout", workoutId] }) });
             }
           }}
           placeholder="Enter workout name first"
@@ -245,7 +245,7 @@ export const Workout = () => {
                 notes: val || undefined,
                 setIds: [],
               });
-              updateWorkout(dto, { onSuccess: () => queryClient.invalidateQueries({ queryKey: ["workout", workoutId] }) });
+              updateWorkout({data:dto, id:workoutId}, { onSuccess: () => queryClient.invalidateQueries({ queryKey: ["workout", workoutId] }) });
             }
           }}
           placeholder="Optional notes (editable anytime)"
