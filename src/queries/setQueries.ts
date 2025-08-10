@@ -63,6 +63,20 @@ export const useUpdateSet = (setId: number) => {
   return { mutate, error, isPending };
 };
 
+// Dynamic variant allowing passing the id at mutate time (useful for inline editing lists)
+export const useUpdateSetDynamic = () => {
+  const { mutate, error, isPending } = useMutation({
+    mutationKey: ["updateSetDynamic"],
+    mutationFn: async (params: { id: number; data: SetCreateDto }) => {
+      const { id, data } = params;
+      const response = await apiClient.setPUT(id, data);
+      return response;
+    },
+  });
+
+  return { mutate, error, isPending };
+};
+
 export const useDeleteSet = (setId: number) => {
   const { mutate, error, isPending } = useMutation({
     mutationKey: ["deleteSet", setId],
